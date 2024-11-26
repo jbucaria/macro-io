@@ -39,6 +39,7 @@ export default function RootLayout() {
         <Stack.Screen name="+not-found" />
         <Stack.Screen name="barcode" options={{ headerShown: false }} />
         <Stack.Screen name="adjustGoals" options={{ headerShown: false }} />
+        <Stack.Screen name="foodSearch" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

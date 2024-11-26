@@ -5,18 +5,5 @@
       "@/*": ["./*"]
     }
   },
-  "include": [
-    "**/*.js",
-    "**/*.jsx",
-    "hooks/useColorScheme.js",
-    "constants/Colors.js",
-    "app/(tabs)/explore.js",
-    "app/(tabs)/_layout.js",
-    "app/+not-found.js",
-    "components/ui/TabBarBackground.js",
-    "hooks/useThemeColor.js",
-    "components/ui/IconSymbol.js",
-    "app/(tabs)/index.js",
-    "components/ParallaxScrollView.js"
-  ]
+  "include": ["**/*"]
 }
