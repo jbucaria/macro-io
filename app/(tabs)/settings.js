@@ -6,9 +6,12 @@ import { Link } from 'expo-router'
 const settings = () => {
   return (
     <View className="flex-1 justify-center items-center">
-      <Link href={'/adjustGoals'} asChild>
-        <Text>Go to adjust goals</Text>
-      </Link>
+      <Text>Settings</Text>
+      <View className="p-8">
+        <Link href={'/(tabs)'} asChild>
+          <Text className="font-bold text-red-500 text-4xl">Go Home</Text>
+        </Link>
+      </View>
     </View>
   )
 }
