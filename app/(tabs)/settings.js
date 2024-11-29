@@ -11,6 +11,9 @@ const settings = () => {
         <Link href={'/(tabs)'} asChild>
           <Text className="font-bold text-red-500 text-4xl">Go Home</Text>
         </Link>
+        <Link href={'/login'} asChild>
+          <Text className="font-bold text-blue-500 text-4xl">Login</Text>
+        </Link>
       </View>
     </View>
   )
