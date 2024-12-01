@@ -26,13 +26,6 @@ export default function TabLayout() {
           default: {},
         }),
       }}
-
-      //   <IconSymbol
-      //   name="gearshape.fill"
-      //   size={30}
-      //   color="green"
-      //   weight="semibold"
-      // />
     >
       <Tabs.Screen
         name="index"

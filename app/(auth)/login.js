@@ -12,6 +12,7 @@ import {
   appleAuth,
 } from '@invertase/react-native-apple-authentication'
 import auth from '@react-native-firebase/auth'
+import { Stack } from 'expo-router'
 
 const Index = () => {
   const [initializing, setInitializing] = useState(true)
@@ -43,7 +44,7 @@ const Index = () => {
       // Optionally, you can update the user's display name here
       await userCredential.user.updateProfile({ displayName: username })
 
-      console.log('User signed up:', userCredential)
+      // console.log('User signed up:', userCredential)
       setUser(userCredential.user)
     } catch (error) {
       console.error('Error during Sign-Up:', error.message)
@@ -58,7 +59,7 @@ const Index = () => {
         email,
         password
       )
-      console.log('User signed in:', userCredential)
+      // console.log('User signed in:', userCredential)
       setUser(userCredential.user)
     } catch (error) {
       console.error('Error during Sign-In:', error.message)
@@ -74,7 +75,7 @@ const Index = () => {
         requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
       })
 
-      console.log('Apple Auth Response:', appleAuthRequestResponse)
+      // console.log('Apple Auth Response:', appleAuthRequestResponse)
 
       // Ensure Apple returned a user identityToken
       if (!appleAuthRequestResponse.identityToken) {
@@ -88,16 +89,16 @@ const Index = () => {
         nonce
       )
 
-      console.log('Firebase Apple Credential:', appleCredential)
+      // console.log('Firebase Apple Credential:', appleCredential)
 
       // Sign the user in with the credential
       const userCredential = await auth().signInWithCredential(appleCredential)
-      console.log('Firebase User Credential:', userCredential)
+      // console.log('Firebase User Credential:', userCredential)
 
       // Set user manually in state
       if (userCredential && userCredential.user) {
         setUser(userCredential.user)
-        console.log('User signed in:', userCredential.user)
+        // console.log('User signed in:', userCredential.user)
       }
     } catch (error) {
       console.error('Error during Apple Sign-In:', error)
@@ -206,22 +207,6 @@ const Index = () => {
       </SafeAreaView>
     )
   }
-
-  // If the user is signed in, show the welcome screen
-  return (
-    <SafeAreaView className="flex-1 justify-center items-center">
-      <Text>Welcome {user.displayName ? user.displayName : user.email}</Text>
-      <TouchableOpacity
-        onPress={() =>
-          auth()
-            .signOut()
-            .then(() => setUser(null))
-        }
-      >
-        <Text>Sign out</Text>
-      </TouchableOpacity>
-    </SafeAreaView>
-  )
 }
 
 export default Index
