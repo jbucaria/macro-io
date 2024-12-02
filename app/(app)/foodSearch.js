@@ -10,8 +10,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 import axios from 'axios'
 import { Link } from 'expo-router'
-import { IconSymbol } from '@/components/ui/IconSymbol' // Replace with your icon implementation
-import FoodItemDetails from '@/components/FoodItemDetail'
+import { IconSymbol } from '@/src/components/ui/IconSymbol' // Replace with your icon implementation
+import FoodItemDetails from '@/src/components/FoodItemDetail'
 
 const FoodSearchScreen = () => {
   const [query, setQuery] = useState('')

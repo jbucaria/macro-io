@@ -1,3 +1,5 @@
+// FILE: /app/index.js
+
 import {
   View,
   Text,
@@ -7,24 +9,33 @@ import {
   Button,
 } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import {
-  AppleButton,
-  appleAuth,
-} from '@invertase/react-native-apple-authentication'
+import { AppleButton } from '@invertase/react-native-apple-authentication'
 import auth from '@react-native-firebase/auth'
 import { Stack } from 'expo-router'
+import { onAppleButtonPress } from '@/src/utils/AppleLogin' // Import the Apple login function
+import useStore from '@/src/store/useStore' // Import the Zustand store
 
 const Index = () => {
   const [initializing, setInitializing] = useState(true)
-  const [user, setUser] = useState(null)
   const [email, setEmail] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [isSigningUp, setIsSigningUp] = useState(false) // Toggle between Sign-In and Sign-Up
 
+  const setUser = useStore(state => state.setUser)
+  const clearUser = useStore(state => state.clearUser)
+
   // Handle user state changes
   function onAuthStateChanged(user) {
-    setUser(user)
+    if (user) {
+      setUser({
+        email: user.email,
+        displayName: user.displayName,
+        uid: user.uid,
+      })
+    } else {
+      clearUser()
+    }
     if (initializing) setInitializing(false)
   }
 
@@ -45,7 +56,11 @@ const Index = () => {
       await userCredential.user.updateProfile({ displayName: username })
 
       // console.log('User signed up:', userCredential)
-      setUser(userCredential.user)
+      setUser({
+        email: userCredential.user.email,
+        displayName: userCredential.user.displayName,
+        uid: userCredential.user.uid,
+      })
     } catch (error) {
       console.error('Error during Sign-Up:', error.message)
     }
@@ -60,153 +75,76 @@ const Index = () => {
         password
       )
       // console.log('User signed in:', userCredential)
-      setUser(userCredential.user)
+      setUser({
+        email: userCredential.user.email,
+        displayName: userCredential.user.displayName,
+        uid: userCredential.user.uid,
+      })
     } catch (error) {
       console.error('Error during Sign-In:', error.message)
     }
   }
 
-  // Sign in with Apple
-  async function onAppleButtonPress() {
-    try {
-      // Start the sign-in request
-      const appleAuthRequestResponse = await appleAuth.performRequest({
-        requestedOperation: appleAuth.Operation.LOGIN,
-        requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
-      })
-
-      // console.log('Apple Auth Response:', appleAuthRequestResponse)
-
-      // Ensure Apple returned a user identityToken
-      if (!appleAuthRequestResponse.identityToken) {
-        throw new Error('Apple Sign-In failed - no identity token returned')
-      }
-
-      // Create a Firebase credential from the response
-      const { identityToken, nonce } = appleAuthRequestResponse
-      const appleCredential = auth.AppleAuthProvider.credential(
-        identityToken,
-        nonce
-      )
-
-      // console.log('Firebase Apple Credential:', appleCredential)
-
-      // Sign the user in with the credential
-      const userCredential = await auth().signInWithCredential(appleCredential)
-      // console.log('Firebase User Credential:', userCredential)
-
-      // Set user manually in state
-      if (userCredential && userCredential.user) {
-        setUser(userCredential.user)
-        // console.log('User signed in:', userCredential.user)
-      }
-    } catch (error) {
-      console.error('Error during Apple Sign-In:', error)
-    }
-  }
-
-  // If the user is initializing, return null
-  if (initializing) return null
-
-  // If the user is not signed in, show the sign-up and sign-in options
-  if (!user) {
-    return (
-      <SafeAreaView className="flex-1 justify-center items-center">
+  return (
+    <SafeAreaView className="flex-1 justify-center items-center bg-white">
+      <View className="w-full max-w-xs">
+        <Text className="text-2xl font-bold mb-4">Login Page</Text>
+        <TextInput
+          className="border border-gray-300 rounded px-4 py-2 mb-4"
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+        />
+        <TextInput
+          className="border border-gray-300 rounded px-4 py-2 mb-4"
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
+        />
+        <TextInput
+          className="border border-gray-300 rounded px-4 py-2 mb-4"
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
         {isSigningUp ? (
-          <>
-            <TextInput
-              placeholder="Username"
-              value={username}
-              onChangeText={setUsername}
-              style={{
-                borderWidth: 1,
-                padding: 8,
-                marginBottom: 10,
-                width: 200,
-              }}
-            />
-            <TextInput
-              placeholder="Email"
-              value={email}
-              onChangeText={setEmail}
-              style={{
-                borderWidth: 1,
-                padding: 8,
-                marginBottom: 10,
-                width: 200,
-              }}
-              keyboardType="email-address"
-            />
-            <TextInput
-              placeholder="Password"
-              value={password}
-              onChangeText={setPassword}
-              style={{
-                borderWidth: 1,
-                padding: 8,
-                marginBottom: 20,
-                width: 200,
-              }}
-              secureTextEntry
-            />
-            <Button title="Sign Up" onPress={handleSignUp} />
-            <TouchableOpacity onPress={() => setIsSigningUp(false)}>
-              <Text style={{ marginTop: 20 }}>
-                Already have an account? Sign In
-              </Text>
-            </TouchableOpacity>
-          </>
+          <Button title="Sign Up" onPress={handleSignUp} />
         ) : (
-          <>
-            <TextInput
-              placeholder="Email"
-              value={email}
-              onChangeText={setEmail}
-              style={{
-                borderWidth: 1,
-                padding: 8,
-                marginBottom: 10,
-                width: 200,
-              }}
-              keyboardType="email-address"
-            />
-            <TextInput
-              placeholder="Password"
-              value={password}
-              onChangeText={setPassword}
-              style={{
-                borderWidth: 1,
-                padding: 8,
-                marginBottom: 20,
-                width: 200,
-              }}
-              secureTextEntry
-            />
-            <Button title="Sign In" onPress={handleSignIn} />
-            <TouchableOpacity onPress={() => setIsSigningUp(true)}>
-              <Text style={{ marginTop: 20 }}>
-                Don't have an account? Sign Up
-              </Text>
-            </TouchableOpacity>
-            <AppleButton
-              buttonStyle={AppleButton.Style.BLACK}
-              buttonType={AppleButton.Type.SIGN_IN}
-              style={{
-                width: 160,
-                height: 45,
-                marginTop: 20,
-              }}
-              onPress={() =>
-                onAppleButtonPress().then(() =>
-                  console.log('Apple sign-in complete!')
-                )
-              }
-            />
-          </>
+          <Button title="Sign In" onPress={handleSignIn} />
         )}
-      </SafeAreaView>
-    )
-  }
+        <TouchableOpacity
+          className="mt-4"
+          onPress={() => setIsSigningUp(!isSigningUp)}
+        >
+          <Text className="text-blue-500">
+            {isSigningUp ? 'Switch to Sign In' : 'Switch to Sign Up'}
+          </Text>
+        </TouchableOpacity>
+        <AppleButton
+          buttonStyle={AppleButton.Style.BLACK}
+          buttonType={AppleButton.Type.SIGN_IN}
+          style={{
+            width: 160,
+            height: 45,
+            marginTop: 16,
+          }}
+          onPress={async () => {
+            try {
+              const user = await onAppleButtonPress()
+              setUser({
+                email: user.email,
+                displayName: user.displayName,
+                uid: user.uid,
+              })
+            } catch (error) {
+              console.error('Error during Apple Sign-In:', error.message)
+            }
+          }}
+        />
+      </View>
+    </SafeAreaView>
+  )
 }
 
 export default Index

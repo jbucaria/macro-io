@@ -1,7 +1,7 @@
 import React from 'react'
 import { BlurView } from 'expo-blur'
 import { View, Text, Pressable, Modal } from 'react-native'
-import { IconSymbol } from '@/components/ui/IconSymbol'
+import { IconSymbol } from '@/src/components/ui/IconSymbol'
 import { Link } from 'expo-router'
 
 const ActionModal = ({ visible, onClose, closeModal }) => {

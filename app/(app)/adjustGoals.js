@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Text, Pressable, ScrollView } from 'react-native'
-import { IconSymbol } from '@/components/ui/IconSymbol' // Replace with your Icon Component
+import { IconSymbol } from '@/src/components/ui/IconSymbol' // Replace with your Icon Component
 import { Link } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 

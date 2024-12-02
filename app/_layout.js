@@ -1,6 +1,6 @@
 import 'react-native-reanimated'
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth'
-import { useColorScheme } from '@/hooks/useColorScheme'
+import { useColorScheme } from '@/src/hooks/useColorScheme'
 import { useFonts } from 'expo-font'
 import { Slot, Stack, useRouter, useSegments } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
@@ -44,7 +44,6 @@ export default function RootLayout() {
   useEffect(() => {
     if (initializing) return
 
-    console.log('segments', segments)
     if (!user && inAuthGroup !== '(auth)') {
       router.replace('/(auth)/login')
     } else if (user && inAuthGroup !== '(app)') {

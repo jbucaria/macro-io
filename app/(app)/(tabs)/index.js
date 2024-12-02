@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
 import { View, Text, Pressable, ScrollView } from 'react-native'
-import { IconSymbol } from '@/components/ui/IconSymbol'
-import ActionModal from '@/components/ActionModal'
+import { IconSymbol } from '@/src/components/ui/IconSymbol'
+import ActionModal from '@/src/components/ActionModal'
 import { Link } from 'expo-router'
-import { ThemedText } from '@/components/ThemedText'
-import { ThemedView } from '@/components/ThemedView'
+import { ThemedText } from '@/src/components/ThemedText'
+import { ThemedView } from '@/src/components/ThemedView'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import useStore from '@/src/store/useStore'
 
 export default function App() {
   const [modalVisible, setModalVisible] = useState(false)
+  const user = useStore(state => state.user)
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100 w-f">
@@ -21,6 +23,9 @@ export default function App() {
           <View className="flex-row items-center space-x-2">
             <IconSymbol name="applelogo" size={24} color="#000" />
             <Text className="text-xl font-bold">Macro.io</Text>
+            {user && (
+              <Text className="text-sm text-gray-500 ml-2">{user.email}</Text>
+            )}
           </View>
           <View className="flex-row items-center space-x-4">
             <View className="bg-orange-100 p-2 rounded-full">
