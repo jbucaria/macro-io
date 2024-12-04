@@ -1,34 +1,37 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
-  View,
-  Text,
+  ActivityIndicator,
   StyleSheet,
+  Text,
   TouchableOpacity,
-  Pressable,
+  View,
 } from 'react-native'
+import { DetectionCameraView } from '@passiolife/nutritionai-react-native-sdk-v3'
+import { useQuickScan } from '@/src/hooks/useQuickScan'
+import { QuickFoodResult } from '@/src/components/QuickFoodResult'
 import {
-  PassioSDK,
-  DetectionCameraView,
-} from '@passiolife/nutritionai-react-native-sdk-v3'
-import { Link } from 'expo-router'
-import { IconSymbol } from '@/src/components/ui/IconSymbol'
+  configurePassioSDK,
+  requestCameraAuthorization,
+  startFoodDetection,
+} from '@/src/utils/passioSdk'
 
-const FoodDetectionApp = ({ onClose }) => {
+const QuickScanningScreen = ({ onClose, onFoodDetail }) => {
+  const {
+    loading,
+    passioFoodItem,
+    onClearResultPress,
+    alternative,
+    onAlternativeFoodItemChange,
+  } = useQuickScan()
+
   const [loadingState, setLoadingState] = useState('')
   const [isCameraAuthorized, setCameraAuthorized] = useState(false)
   const [isReady, setIsReady] = useState(false)
 
-  // Initialize the SDK
   useEffect(() => {
-    async function configureSDK() {
+    async function initializeSDK() {
       try {
-        const status = await PassioSDK.configure({
-          key: '9DNuQvuKEnyROsSAe4a7BLZ3fCbptYn0nCWnZquo', // Replace with your Passio license key
-          debugMode: false, // Set to true to enable debug logs
-          autoUpdate: true, // Enable automatic model updates
-          remoteOnly: false, // Set to true if only remote recognition is desired
-        })
-
+        const status = await configurePassioSDK()
         switch (status.mode) {
           case 'notReady':
             console.warn('SDK is not ready. Missing model files.')
@@ -45,125 +48,112 @@ const FoodDetectionApp = ({ onClose }) => {
             break
         }
       } catch (err) {
-        console.error(`PassioSDK Error: ${err}`)
         setLoadingState('error')
       }
     }
 
-    configureSDK()
+    initializeSDK()
   }, [])
 
-  // Request camera permission
   useEffect(() => {
-    PassioSDK.requestCameraAuthorization().then(cameraAuthorized => {
-      setCameraAuthorized(cameraAuthorized)
+    requestCameraAuthorization().then(isAuthorized => {
+      setCameraAuthorized(isAuthorized)
     })
   }, [])
 
-  // Start Food Detection
   useEffect(() => {
     if (!isReady) return
 
     const config = {
-      detectBarcodes: true, // Enable barcode detection
-      detectPackagedFood: true, // Enable detection of packaged food
+      detectBarcodes: true,
+      detectPackagedFood: true,
     }
 
-    const subscription = PassioSDK.startFoodDetection(
-      config,
-      async detection => {
-        const { candidates } = detection
+    const subscription = startFoodDetection(config, detection => {
+      const { candidates } = detection
 
-        if (candidates?.barcodeCandidates?.length) {
-          console.log('Barcode Candidates:', candidates.barcodeCandidates)
-          // Handle barcode detection results
-        } else if (candidates?.packagedFoodCode?.length) {
-          console.log('Packaged Food Detected:', candidates.packagedFoodCode)
-          // Handle packaged food detection results
-        } else if (candidates?.detectedCandidates?.length) {
-          console.log(
-            'Visually Recognized Food:',
-            candidates.detectedCandidates
-          )
-          // Handle visual recognition results
-        }
+      if (candidates?.barcodeCandidates?.length) {
+        console.log('Barcode Candidates:', candidates.barcodeCandidates)
+      } else if (candidates?.packagedFoodCode?.length) {
+        console.log('Packaged Food Detected:', candidates.packagedFoodCode)
+      } else if (candidates?.detectedCandidates?.length) {
+        console.log('Visually Recognized Food:', candidates.detectedCandidates)
       }
-    )
+    })
 
-    // Stop food detection when component unmounts
     return () => subscription.remove()
   }, [isReady])
 
+  const styles = quickScanStyle()
+
   return (
-    <View
-      className="flex-1 justify-center items-center
-    "
-    >
-      {loadingState === 'ready' && isCameraAuthorized ? (
-        <>
-          <DetectionCameraView style={styles.cameraView} />
-          <Link href={'/(tabs)'} asChild>
-            <Pressable style={{ alignItems: 'center' }}>
-              <IconSymbol name="x.circle" size={40} color="#000" />
-            </Pressable>
-          </Link>
-        </>
+    <View style={styles.blackBackgroundStyle}>
+      {isCameraAuthorized ? (
+        <DetectionCameraView style={styles.detectionCamera} />
       ) : (
-        <View style={styles.messageContainer}>
-          {loadingState === 'error' && (
-            <Text style={styles.errorText}>Error configuring Passio SDK</Text>
-          )}
-          {!isCameraAuthorized && (
-            <Text style={styles.infoText}>
-              Camera permission is required to use this feature.
-            </Text>
-          )}
-          {loadingState === 'notReady' && (
-            <Text style={styles.infoText}>
-              SDK is not ready. Please wait...
-            </Text>
-          )}
+        <View style={styles.loadingIndicator}>
+          <Text>Camera authorization is required</Text>
         </View>
       )}
+      {loading && (
+        <View style={styles.loadingIndicator}>
+          <ActivityIndicator />
+          <Text>Scanning...</Text>
+        </View>
+      )}
+      {passioFoodItem && (
+        <QuickFoodResult
+          attribute={passioFoodItem}
+          onAlternativeFoodItemChange={onAlternativeFoodItemChange}
+          onClearResultPress={onClearResultPress}
+          alternativeAttributes={alternative || []}
+          onItemClick={onFoodDetail}
+        />
+      )}
+      <View style={styles.closeButton}>
+        <TouchableOpacity onPress={onClose}>
+          <Text style={styles.text}>✕</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-  cameraView: {
-    flex: 1,
-    width: '100%',
-  },
-  messageContainer: {
-    padding: 20,
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  infoText: {
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  closeButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    backgroundColor: 'red',
-    padding: 10,
-    borderRadius: 5,
-  },
-})
+const quickScanStyle = () =>
+  StyleSheet.create({
+    detectionCamera: {
+      flex: 1,
+      width: '100%',
+    },
+    blackBackgroundStyle: {
+      backgroundColor: 'black',
+      width: '100%',
+      flex: 1,
+      flexDirection: 'column',
+    },
+    loadingIndicator: {
+      backgroundColor: 'white',
+      minHeight: 150,
+      borderTopRightRadius: 24,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderTopLeftRadius: 24,
+      position: 'absolute',
+      bottom: 0,
+      right: 0,
+      left: 0,
+    },
+    text: {
+      color: 'white',
+      fontSize: 30,
+    },
+    closeButton: {
+      position: 'absolute',
+      top: 45,
+      right: 25,
+      zIndex: 1000,
+      color: 'white',
+    },
+  })
 
-export default FoodDetectionApp
+export default QuickScanningScreen

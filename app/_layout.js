@@ -30,7 +30,7 @@ export default function RootLayout() {
   })
 
   const onAuthStateChanged = user => {
-    console.log('onAuthStateChanged', user)
+    // console.log('onAuthStateChanged', user)
     setUser(user)
     if (initializing) setInitializing(false)
   }
