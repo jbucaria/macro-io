@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+} from 'react-native'
 import {
   PassioSDK,
   DetectionCameraView,
 } from '@passiolife/nutritionai-react-native-sdk-v3'
+import { Link } from 'expo-router'
+import { IconSymbol } from '@/src/components/ui/IconSymbol'
 
-const FoodDetectionApp = () => {
+const FoodDetectionApp = ({ onClose }) => {
   const [loadingState, setLoadingState] = useState('')
   const [isCameraAuthorized, setCameraAuthorized] = useState(false)
   const [isReady, setIsReady] = useState(false)
@@ -87,9 +95,19 @@ const FoodDetectionApp = () => {
   }, [isReady])
 
   return (
-    <View style={styles.container}>
+    <View
+      className="flex-1 justify-center items-center
+    "
+    >
       {loadingState === 'ready' && isCameraAuthorized ? (
-        <DetectionCameraView style={styles.cameraView} />
+        <>
+          <DetectionCameraView style={styles.cameraView} />
+          <Link href={'/(tabs)'} asChild>
+            <Pressable style={{ alignItems: 'center' }}>
+              <IconSymbol name="x.circle" size={40} color="#000" />
+            </Pressable>
+          </Link>
+        </>
       ) : (
         <View style={styles.messageContainer}>
           {loadingState === 'error' && (
@@ -133,6 +151,18 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 16,
     textAlign: 'center',
+  },
+  closeButtonText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
   },
 })
 
