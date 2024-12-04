@@ -1,3 +1,4 @@
+import '../global.css'
 import 'react-native-reanimated'
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth'
 import { useColorScheme } from '@/src/hooks/useColorScheme'
@@ -12,7 +13,7 @@ import {
   DarkTheme,
   DefaultTheme,
 } from '@react-navigation/native'
-import '../global.css'
+import { configurePassioSDK } from '@/src/utils/passioSdk'
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync()
@@ -38,6 +39,23 @@ export default function RootLayout() {
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged)
     return subscriber
+  }, [])
+
+  useEffect(() => {
+    const initializePassioSDK = async () => {
+      try {
+        const status = await configurePassioSDK()
+        if (status.mode !== 'isReadyForDetection') {
+          console.error('PassioSDK is not ready for detection:', status)
+        } else {
+          console.log('PassioSDK initialized successfully')
+        }
+      } catch (err) {
+        console.error('Failed to configure PassioSDK:', err)
+      }
+    }
+
+    initializePassioSDK()
   }, [])
 
   const inAuthGroup = useSegments()[0]

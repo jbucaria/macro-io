@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import {
   ActivityIndicator,
+  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native'
+import { Link } from 'expo-router'
 import { DetectionCameraView } from '@passiolife/nutritionai-react-native-sdk-v3'
 import { useQuickScan } from '@/src/hooks/useQuickScan'
 import { QuickFoodResult } from '@/src/components/QuickFoodResult'
@@ -111,9 +113,12 @@ const QuickScanningScreen = ({ onClose, onFoodDetail }) => {
         />
       )}
       <View style={styles.closeButton}>
-        <TouchableOpacity onPress={onClose}>
-          <Text style={styles.text}>✕</Text>
-        </TouchableOpacity>
+        <Link href={'/(tabs)'} onChild>
+          <Pressable></Pressable>
+          <TouchableOpacity>
+            <Text style={styles.text}>✕</Text>
+          </TouchableOpacity>
+        </Link>
       </View>
     </View>
   )
