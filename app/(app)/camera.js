@@ -31,33 +31,6 @@ const QuickScanningScreen = ({ onClose, onFoodDetail }) => {
   const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
-    async function initializeSDK() {
-      try {
-        const status = await configurePassioSDK()
-        switch (status.mode) {
-          case 'notReady':
-            console.warn('SDK is not ready. Missing model files.')
-            setLoadingState('notReady')
-            break
-          case 'isReadyForDetection':
-            console.log('SDK is ready for detection')
-            setLoadingState('ready')
-            setIsReady(true)
-            break
-          case 'error':
-            console.error(`PassioSDK Error: ${status.errorMessage}`)
-            setLoadingState('error')
-            break
-        }
-      } catch (err) {
-        setLoadingState('error')
-      }
-    }
-
-    initializeSDK()
-  }, [])
-
-  useEffect(() => {
     requestCameraAuthorization().then(isAuthorized => {
       setCameraAuthorized(isAuthorized)
     })

@@ -20,30 +20,35 @@ const BottomBar = ({
   const styles = BottomBarStyle()
 
   return (
-    <View style={styles.row}>
-      <View style={[styles.row, styles.inputContainer]}>
-        <TouchableOpacity onPress={plusIconHandler} style={styles.plusIconView}>
-          <IconSymbol
-            name="plus"
-            resizeMode="contain"
-            style={styles.plusIcon}
-          />
-        </TouchableOpacity>
-        <TextInput
-          placeholder="Type your message here..."
-          style={styles.input}
-          value={inputValue}
-          onChangeText={val => textInputChnageHandler(val)}
-        />
-      </View>
-      <View>
-        {sending ? (
-          <ActivityIndicator style={styles.sendBtn} />
-        ) : (
-          <TouchableOpacity onPress={sendBtnHandler} style={styles.sendBtn}>
-            <Text style={styles.sendBtnText}>Send</Text>
+    <View>
+      <View style={styles.row}>
+        <View style={[styles.row, styles.inputContainer]}>
+          <TouchableOpacity
+            onPress={plusIconHandler}
+            style={styles.plusIconView}
+          >
+            <IconSymbol
+              name="plus"
+              resizeMode="contain"
+              style={styles.plusIcon}
+            />
           </TouchableOpacity>
-        )}
+          <TextInput
+            placeholder="Type your message here..."
+            style={styles.input}
+            value={inputValue}
+            onChangeText={val => textInputChnageHandler(val)}
+          />
+        </View>
+        <View>
+          {sending ? (
+            <ActivityIndicator style={styles.sendBtn} />
+          ) : (
+            <TouchableOpacity onPress={sendBtnHandler} style={styles.sendBtn}>
+              <Text style={styles.sendBtnText}>Send</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     </View>
   )

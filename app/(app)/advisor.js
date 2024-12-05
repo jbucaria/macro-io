@@ -17,6 +17,8 @@ import MessageSendTextView from '@/src/components/message/ MessageSendTextView'
 import MessageResponseView from '@/src/components/message/MessageRespondView'
 import MessageSendImageView from '@/src/components/message/MessageSendImageView'
 import TypingView from '@/src/components/message/TypingView'
+import { IconSymbol } from '@/src/components/ui/IconSymbol'
+import { Link } from 'expo-router'
 
 const ChatScreen = ({ onClose }) => {
   const {
@@ -62,20 +64,27 @@ const ChatScreen = ({ onClose }) => {
     }
   }
 
+  const test = () => {
+    console.log('test')
+  }
+
   return (
     <>
       <SafeAreaView style={styles.body}>
         <View style={styles.closeButton}>
-          <TouchableOpacity onPress={onClose}>
-            <Image
-              style={styles.closeText}
-              source={require('@/assets/images/back.png')}
-            />
-          </TouchableOpacity>
+          <Link href={'/foodSearch'} onChild>
+            <TouchableOpacity>
+              <IconSymbol
+                style={styles.closeText}
+                source={require('@/assets/images/back.png')}
+              />
+            </TouchableOpacity>
+          </Link>
         </View>
         <KeyboardAvoidingView
           style={styles.body}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={100}
         >
           <View style={[styles.body, styles.container]}>
             <View style={styles.chatBody}>
